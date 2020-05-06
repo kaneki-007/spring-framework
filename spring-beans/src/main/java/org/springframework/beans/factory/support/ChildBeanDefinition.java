@@ -41,6 +41,9 @@ import org.springframework.util.ObjectUtils;
  * @author Juergen Hoeller
  * @see GenericBeanDefinition
  * @see RootBeanDefinition
+ *
+ * 子 <bean>
+ *
  */
 @SuppressWarnings("serial")
 public class ChildBeanDefinition extends AbstractBeanDefinition {

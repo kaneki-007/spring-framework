@@ -115,18 +115,40 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * This implementation performs an actual refresh of this context's underlying
 	 * bean factory, shutting down the previous bean factory (if any) and
 	 * initializing a fresh bean factory for the next phase of the context's lifecycle.
+	 * 	创建 BeanFactory 并对其就行一番初始化：
+	 * 	1、关闭以前的Bean工厂（如果有的话）
+	 * 	2、为该上下文的生命周期的下一阶段初始化新鲜的Bean工厂
 	 */
 	@Override
 	protected final void refreshBeanFactory() throws BeansException {
+		/**
+		 * 如存在一个 BeanFactory，如果存在则对其进行销毁和关闭
+		 */
 		if (hasBeanFactory()) {
+			// 销毁
 			destroyBeans();
+			// 关闭
 			closeBeanFactory();
 		}
 		try {
+			// 2、创建一个 BeanFactory 实例，其实就是 DefaultListableBeanFactory
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
+			//为序列化目的指定一个id，如果需要，可以将此BeanFactory从此id反序列化回BeanFactory对象
 			beanFactory.setSerializationId(getId());
+			/**
+			 * 3、定制BeanFactory
+			 * 设置启动参数（bean可覆盖、循环引用），开启注解自动装配
+			 */
 			customizeBeanFactory(beanFactory);
+			/**
+			 * 4、加载 BeanDefinition
+			 *  将所有BeanDefinition载入beanFactory中，此处依旧是模板方法，具体由子类实现
+ 			 */
 			loadBeanDefinitions(beanFactory);
+			/**
+			 * 5、将创建好的 bean 工厂的引用交给context 来管理
+			 * beanFactory同步赋值
+			 */
 			synchronized (this.beanFactoryMonitor) {
 				this.beanFactory = beanFactory;
 			}

@@ -228,23 +228,36 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		return null;
 	}
 
+	/**
+	 * 获取early Bean引用（只有单例Bean在创建）
+	 */
 	@Override
 	public Object getEarlyBeanReference(Object bean, String beanName) throws BeansException {
 		Object cacheKey = getCacheKey(bean.getClass(), beanName);
 		if (!this.earlyProxyReferences.contains(cacheKey)) {
+			// 1、将cacheKey添加到earlyProxyReferences缓存，从而避免多次重复创建
 			this.earlyProxyReferences.add(cacheKey);
 		}
+		// 2、包装目标对象到AOP代理对象（如果需要）
 		return wrapIfNecessary(bean, beanName, cacheKey);
 	}
 
 	@Override
 	public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
+		// 1、得到一个缓存的唯一key（根据beanClass和beanName生成唯一key）
 		Object cacheKey = getCacheKey(beanClass, beanName);
-
+		// 2、如果当前targetSourcedBeans（通过自定义TargetSourceCreator创建的TargetSource）不包含cacheKey
 		if (beanName == null || !this.targetSourcedBeans.contains(beanName)) {
+			// 2.1、advisedBeans（已经被增强的Bean，即AOP代理对象）中包含当前cacheKey，返回null，即走Spring默认流程
 			if (this.advisedBeans.containsKey(cacheKey)) {
 				return null;
 			}
+			/**
+			 * 2.2、
+			 * 如果是基础设施类（如Advisor、Advice、AopInfrastructureBean的实现）不进行处理
+			 * shouldSkip 默认false，可以生成子类覆盖，
+			 * 如AspectJAwareAdvisorAutoProxyCreator覆盖（if (((AbstractAspectJAdvice) advisor.getAdvice()).getAspectName().equals(beanName)) return true;  即如果是自己就跳过）
+			 */
 			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
 				this.advisedBeans.put(cacheKey, Boolean.FALSE);
 				return null;
@@ -254,12 +267,18 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		// Create proxy here if we have a custom TargetSource.
 		// Suppresses unnecessary default instantiation of the target bean:
 		// The TargetSource will handle target instances in a custom fashion.
+		// 3、开始创建AOP代理对象
 		if (beanName != null) {
+			// 3.1、配置自定义的TargetSourceCreator进行TargetSource创建
 			TargetSource targetSource = getCustomTargetSource(beanClass, beanName);
+			// 3.2、如果targetSource不为null 添加到targetSourcedBeans缓存，并创建AOP代理对象
 			if (targetSource != null) {
 				this.targetSourcedBeans.add(beanName);
+				// specificInterceptors即增强（包括前置增强、后置增强等等）
 				Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(beanClass, beanName, targetSource);
+				// 3.3、创建代理对象
 				Object proxy = createProxy(beanClass, beanName, specificInterceptors, targetSource);
+				// 3.4、将代理类型放入proxyTypes从而允许后续的predictBeanType()调用获取
 				this.proxyTypes.put(cacheKey, proxy.getClass());
 				return proxy;
 			}
@@ -294,7 +313,12 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		if (bean != null) {
 			Object cacheKey = getCacheKey(bean.getClass(), beanName);
+			/**
+			 * getEarlyBeanReference和postProcessAfterInitialization是二者选一的
+			 */
+			// 1、如果之前调用过getEarlyBeanReference获取包装(目标对象---->AOP代理对象)（如果需要），则不再执行
 			if (!this.earlyProxyReferences.contains(cacheKey)) {
+				// 2、包装目标对象到AOP代理对象（如果需要）
 				return wrapIfNecessary(bean, beanName, cacheKey);
 			}
 		}
@@ -331,23 +355,30 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	 * @return a proxy wrapping the bean, or the raw bean instance as-is
 	 */
 	protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) {
+		// 通过TargetSourceCreator进行自定义TargetSource不需要包装
 		if (beanName != null && this.targetSourcedBeans.contains(beanName)) {
 			return bean;
 		}
+		// 不应该被增强对象不需要包装
 		if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
 			return bean;
 		}
+		// 基础设施或应该skip的不需要保证
 		if (isInfrastructureClass(bean.getClass()) || shouldSkip(bean.getClass(), beanName)) {
 			this.advisedBeans.put(cacheKey, Boolean.FALSE);
 			return bean;
 		}
 
 		// Create proxy if we have advice.
+		// 获取该类所有增强
 		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
 		if (specificInterceptors != DO_NOT_PROXY) {
+			// 单例Bean只被增强一次，将cacheKey添加到已经被增强列表，防止多次增强
 			this.advisedBeans.put(cacheKey, Boolean.TRUE);
+			// 创建代理对象,SingletonTargetSource就是TargetSource的实现类,proxy（代理对象）代理的不是target，而是TargetSource
 			Object proxy = createProxy(
 					bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
+			// 缓存代理类型
 			this.proxyTypes.put(cacheKey, proxy.getClass());
 			return proxy;
 		}

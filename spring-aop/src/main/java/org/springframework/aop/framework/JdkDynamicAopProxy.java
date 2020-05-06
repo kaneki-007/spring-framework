@@ -78,6 +78,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 	private static final Log logger = LogFactory.getLog(JdkDynamicAopProxy.class);
 
 	/** Config used to configure this proxy */
+	// AdvisedSupport类中包含了一个TargetSource实例，目标对象就在TargetSource中
 	private final AdvisedSupport advised;
 
 	/**
@@ -190,6 +191,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 			}
 
 			// Get the interception chain for this method.
+			// 这里会去执行增强和目标对象方法
 			List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);
 
 			// Check whether we have any advice. If we don't, we can fallback on direct

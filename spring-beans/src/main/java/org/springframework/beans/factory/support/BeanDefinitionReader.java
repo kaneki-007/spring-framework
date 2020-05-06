@@ -31,7 +31,7 @@ import org.springframework.core.io.ResourceLoader;
  * <p>Note that a bean definition reader does not have to implement
  * this interface. It only serves as suggestion for bean definition
  * readers that want to follow standard naming conventions.
- *
+ * 将Resource资源转成BeanDefinition
  * @author Juergen Hoeller
  * @since 1.1
  * @see org.springframework.core.io.Resource

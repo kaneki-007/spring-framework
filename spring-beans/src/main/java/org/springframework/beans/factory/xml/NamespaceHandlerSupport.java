@@ -77,6 +77,7 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	/**
 	 * Locates the {@link BeanDefinitionParser} from the register implementations using
 	 * the local name of the supplied {@link Element}.
+	 * 开启默认标签解析
 	 */
 	private BeanDefinitionParser findParserForElement(Element element, ParserContext parserContext) {
 		String localName = parserContext.getDelegate().getLocalName(element);

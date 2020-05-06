@@ -22,6 +22,9 @@ package org.springframework.core;
  *
  * @author Rob Harrop
  * @since 2.0
+ *
+ * 对属性的修改，包括获取、设置、删除
+ *
  */
 public interface AttributeAccessor {
 

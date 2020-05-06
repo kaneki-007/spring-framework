@@ -68,11 +68,14 @@ public class DefaultDocumentLoader implements DocumentLoader {
 	public Document loadDocument(InputSource inputSource, EntityResolver entityResolver,
 			ErrorHandler errorHandler, int validationMode, boolean namespaceAware) throws Exception {
 
+		// 创建文件解析工厂
 		DocumentBuilderFactory factory = createDocumentBuilderFactory(validationMode, namespaceAware);
 		if (logger.isDebugEnabled()) {
 			logger.debug("Using JAXP provider [" + factory.getClass().getName() + "]");
 		}
+		// 创建文档解析器
 		DocumentBuilder builder = createDocumentBuilder(factory, entityResolver, errorHandler);
+		// 解析 Spring 的 Bean 定义资源
 		return builder.parse(inputSource);
 	}
 

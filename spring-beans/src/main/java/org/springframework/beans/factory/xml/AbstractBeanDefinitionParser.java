@@ -56,8 +56,10 @@ public abstract class AbstractBeanDefinitionParser implements BeanDefinitionPars
 	public static final String NAME_ATTRIBUTE = "name";
 
 
+	// 获取解析器Parser解析
 	@Override
 	public final BeanDefinition parse(Element element, ParserContext parserContext) {
+		// 核心方法：将标签解析为 AbstractBeanDefinition
 		AbstractBeanDefinition definition = parseInternal(element, parserContext);
 		if (definition != null && !parserContext.isNested()) {
 			try {

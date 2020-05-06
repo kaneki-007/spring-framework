@@ -69,8 +69,9 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	}
 
 	/**
-	 * Set the config locations for this application context.
-	 * <p>If not set, the implementation may use a default as appropriate.
+	 *
+	 * Set the config locations for this application context. //未应用上下文设置资源路径
+	 * <p>If not set, the implementation may use a default as appropriate. //如果未设置，则实现可以根据需要使用默认值
 	 */
 	public void setConfigLocations(String... locations) {
 		if (locations != null) {
@@ -112,6 +113,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	}
 
 	/**
+	 * 解析给定的资源路径，必要时用相应的环境属性值替换占位符，应用于资源路径配置
 	 * Resolve the given path, replacing placeholders with corresponding
 	 * environment property values if necessary. Applied to config locations.
 	 * @param path the original file path

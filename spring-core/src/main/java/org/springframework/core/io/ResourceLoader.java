@@ -19,6 +19,9 @@ package org.springframework.core.io;
 import org.springframework.util.ResourceUtils;
 
 /**
+ *
+ * 统一资源定位
+ *
  * Strategy interface for loading resources (e.. class path or file system
  * resources). An {@link org.springframework.context.ApplicationContext}
  * is required to provide this functionality, plus extended
@@ -45,6 +48,18 @@ public interface ResourceLoader {
 
 
 	/**
+	 *
+	 * getResource()根据所提供资源的路径 location 返回 Resource 实例，
+	 * 但是它不确保该 Resource 一定存在，需要调用 Resource.exist()方法判断
+	 *
+	 * 该方法支持以下模式的资源加载：
+	 *
+	 * URL位置资源，如”file:C:/test.dat”
+	 * ClassPath位置资源，如”classpath:test.dat”
+	 * 相对路径资源，如”WEB-INF/test.dat”，此时返回的Resource实例根据实现不同而不同
+	 *
+	 *
+	 *
 	 * Return a Resource handle for the specified resource location.
 	 * <p>The handle should always be a reusable resource descriptor,
 	 * allowing for multiple {@link Resource#getInputStream()} calls.

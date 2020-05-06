@@ -104,13 +104,13 @@ public class VelocityToolboxView extends VelocityView {
 		ChainedContext velocityContext = new ChainedContext(
 				new VelocityContext(model), getVelocityEngine(), request, response, getServletContext());
 
-		// Load a Velocity Tools toolbox, if necessary.
-		if (getToolboxConfigLocation() != null) {
-			ToolboxManager toolboxManager = ServletToolboxManager.getInstance(
-					getServletContext(), getToolboxConfigLocation());
-			Map<?, ?> toolboxContext = toolboxManager.getToolbox(velocityContext);
-			velocityContext.setToolbox(toolboxContext);
-		}
+//		// Load a Velocity Tools toolbox, if necessary.
+//		if (getToolboxConfigLocation() != null) {
+//			ToolboxManager toolboxManager = ServletToolboxManager.getInstance(
+//					getServletContext(), getToolboxConfigLocation());
+//			Map<?, ?> toolboxContext = toolboxManager.getToolbox(velocityContext);
+//			velocityContext.setToolbox(toolboxContext);
+//		}
 
 		return velocityContext;
 	}

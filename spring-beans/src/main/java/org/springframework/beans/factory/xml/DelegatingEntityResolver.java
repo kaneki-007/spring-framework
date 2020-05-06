@@ -34,6 +34,8 @@ import org.springframework.util.Assert;
  * @since 2.0
  * @see BeansDtdResolver
  * @see PluggableSchemaResolver
+ *
+ * 分别代理了 dtd 的 BeansDtdResolver 和 xml schemas 的 PluggableSchemaResolver
  */
 public class DelegatingEntityResolver implements EntityResolver {
 
@@ -43,9 +45,9 @@ public class DelegatingEntityResolver implements EntityResolver {
 	/** Suffix for schema definition files */
 	public static final String XSD_SUFFIX = ".xsd";
 
-
+	// dtd 的 BeansDtdResolver:从 classpath 或者 jar 文件加载 dtd
 	private final EntityResolver dtdResolver;
-
+	// xml schemas 的 PluggableSchemaResolver:使用一系列 Map 文件将 schema url 解析到本地 classpath 资源
 	private final EntityResolver schemaResolver;
 
 

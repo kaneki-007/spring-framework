@@ -45,22 +45,28 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	public void registerAlias(String name, String alias) {
 		Assert.hasText(name, "'name' must not be empty");
 		Assert.hasText(alias, "'alias' must not be empty");
+		// name == alias 则去掉alias
 		if (alias.equals(name)) {
 			this.aliasMap.remove(alias);
 		}
 		else {
+			// 缓存缓存记录
 			String registeredName = this.aliasMap.get(alias);
 			if (registeredName != null) {
+				// 缓存中的相等，则直接返回
 				if (registeredName.equals(name)) {
 					// An existing alias - no need to re-register
 					return;
 				}
+				// 不允许则抛出异常
 				if (!allowAliasOverriding()) {
 					throw new IllegalStateException("Cannot register alias '" + alias + "' for name '" +
 							name + "': It is already registered for name '" + registeredName + "'.");
 				}
 			}
+			// 当 A --> B 存在时，如果再次出现 A --> B --> C 则抛出异常
 			checkForAliasCircle(name, alias);
+			// 注册 alias
 			this.aliasMap.put(alias, name);
 		}
 	}
@@ -191,6 +197,10 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	 * Determine the raw name, resolving aliases to canonical names.
 	 * @param name the user-specified name
 	 * @return the transformed name
+	 * 转换 aliasName：
+	 * 取指定的 alias 所表示的最终 beanName。
+	 * 主要是一个循环获取 beanName 的过程，例如别名 A 指向名称为 B 的 bean 则返回 B，
+	 * 若 别名 A 指向别名 B，别名 B 指向名称为 C 的 bean，则返回 C
 	 */
 	public String canonicalName(String name) {
 		String canonicalName = name;

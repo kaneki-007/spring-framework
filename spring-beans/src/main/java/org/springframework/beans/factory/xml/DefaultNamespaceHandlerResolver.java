@@ -108,15 +108,19 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 	 * from the configured mappings.
 	 * @param namespaceUri the relevant namespace URI
 	 * @return the located {@link NamespaceHandler}, or {@code null} if none found
+	 * 获取处理的Handler
 	 */
 	@Override
 	public NamespaceHandler resolve(String namespaceUri) {
+		// 获取所有已经配置的 Handler 映射
 		Map<String, Object> handlerMappings = getHandlerMappings();
+		// 根据 namespaceUri 获取 handler的信息：这里一般都是类路径
 		Object handlerOrClassName = handlerMappings.get(namespaceUri);
 		if (handlerOrClassName == null) {
 			return null;
 		}
 		else if (handlerOrClassName instanceof NamespaceHandler) {
+			// 如果已经做过解析，直接返回
 			return (NamespaceHandler) handlerOrClassName;
 		}
 		else {
@@ -127,8 +131,12 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 					throw new FatalBeanException("Class [" + className + "] for namespace [" + namespaceUri +
 							"] does not implement the [" + NamespaceHandler.class.getName() + "] interface");
 				}
+
+				// 初始化类
 				NamespaceHandler namespaceHandler = (NamespaceHandler) BeanUtils.instantiateClass(handlerClass);
+				// 调用 init() 方法
 				namespaceHandler.init();
+				// 记录在缓存
 				handlerMappings.put(namespaceUri, namespaceHandler);
 				return namespaceHandler;
 			}

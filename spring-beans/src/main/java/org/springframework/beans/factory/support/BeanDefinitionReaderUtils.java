@@ -52,6 +52,9 @@ public class BeanDefinitionReaderUtils {
 	 * (can be {@code null} to just register bean classes by name)
 	 * @return the bean definition
 	 * @throws ClassNotFoundException if the bean class could not be loaded
+	 *
+	 * 设置 parentName 、className、classLoader
+	 *
 	 */
 	public static AbstractBeanDefinition createBeanDefinition(
 			String parentName, String className, ClassLoader classLoader) throws ClassNotFoundException {
@@ -144,10 +147,12 @@ public class BeanDefinitionReaderUtils {
 			BeanDefinitionHolder definitionHolder, BeanDefinitionRegistry registry)
 			throws BeanDefinitionStoreException {
 
+		// 注册 beanName
 		// Register bean definition under primary name.
 		String beanName = definitionHolder.getBeanName();
 		registry.registerBeanDefinition(beanName, definitionHolder.getBeanDefinition());
 
+		// 注册 alias
 		// Register aliases for bean name, if any.
 		String[] aliases = definitionHolder.getAliases();
 		if (aliases != null) {

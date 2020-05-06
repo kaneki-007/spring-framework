@@ -22,6 +22,9 @@ package org.springframework.beans;
  *
  * @author Juergen Hoeller
  * @since 2.0
+ *
+ * 配置元素可以通过getSource() 方法来获取
+ *
  */
 public interface BeanMetadataElement {
 
